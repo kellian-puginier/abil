@@ -49,9 +49,9 @@ export function SeasonRecapStep() {
             </p>
             {playerStats && (
               <div className="grid grid-cols-3 gap-3">
-                <StatCard label="Simple" value={playerStats.matches_simple} />
-                <StatCard label="Double" value={playerStats.matches_double} />
-                <StatCard label="Mixte" value={playerStats.matches_mixte} />
+                <StatCard label={pl('Simple', 'Simples', playerStats.matches_simple)} value={playerStats.matches_simple} />
+                <StatCard label={pl('Double', 'Doubles', playerStats.matches_double)} value={playerStats.matches_double} />
+                <StatCard label={pl('Mixte',  'Mixtes',  playerStats.matches_mixte)}  value={playerStats.matches_mixte} />
               </div>
             )}
             {playerStats?.partners && playerStats.partners.length > 0 && (
@@ -89,6 +89,10 @@ export function SeasonRecapStep() {
       </Button>
     </div>
   )
+}
+
+function pl(singular: string, plural: string, count: number): string {
+  return count > 1 ? plural : singular
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {

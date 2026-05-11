@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { buildUpsertPayload } from '@/lib/flow-save'
 import type { Team, IcDate } from '@/lib/supabase/types'
 import type { BmAssignments } from '@/lib/lineup-rules'
+import { decodeMatchesPerDay } from './MatchFormatStep'
 
 const DAY_LABELS: Record<string, string> = {
   saturday: 'Samedi', sunday: 'Dimanche', weekday: 'Semaine',
@@ -107,7 +108,9 @@ export function SummaryStep() {
 
               <SectionCard title="Format matchs" onEdit={() => router.push('/flow/match-format')} stepId="match-format">
                 <p>Par rencontre : {store.matchesPerEncounter || '—'}</p>
-                {store.matchesPerDay && <p>Par journée : {store.matchesPerDay}</p>}
+                {store.matchesPerDay && (
+                  <p>Par journée : {decodeMatchesPerDay(store.matchesPerDay)}</p>
+                )}
               </SectionCard>
 
               <SectionCard title="Équipes souhaitées" onEdit={() => router.push('/flow/teams')} stepId="teams">
