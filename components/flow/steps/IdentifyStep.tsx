@@ -44,62 +44,71 @@ export function IdentifyStep() {
     setLoading(true)
     setError('')
 
-    const supabase = createClient()
-    const emailNorm = email.toLowerCase().trim()
+    try {
+      const supabase = createClient()
+      const emailNorm = email.toLowerCase().trim()
 
-    // Charger tous les joueurs une seule fois (< 500, tient en mémoire)
-    const { data: allPlayers } = await supabase
-      .from('players')
-      .select('*')
-      .returns<Player[]>()
+      // Charger tous les joueurs une seule fois (< 500, tient en mémoire)
+      const { data: allPlayers, error: fetchError } = await supabase
+        .from('players')
+        .select('*')
+        .returns<Player[]>()
 
-    const pool = allPlayers ?? []
+      if (fetchError) {
+        setError('Impossible de contacter le serveur. Réessaie dans quelques instants.')
+        return
+      }
 
-    // 1. Correspondance exacte nom + prénom
-    const exactNameMatch = pool.find(
-      (p) =>
-        p.first_name.toLowerCase() === firstName.trim().toLowerCase() &&
-        p.last_name.toLowerCase() === lastName.trim().toLowerCase()
-    )
-    if (exactNameMatch) {
-      await continueWithPlayer(exactNameMatch, supabase)
-      return
-    }
+      const pool = allPlayers ?? []
 
-    // 2. Plusieurs joueurs partagent cet email (cas parent/enfants)
-    const byEmail = pool.filter((p) => p.email === emailNorm)
-    if (byEmail.length > 1) {
-      setEmailMatches(byEmail)
-      setEmailModalOpen(true)
+      // 1. Correspondance exacte nom + prénom
+      const exactNameMatch = pool.find(
+        (p) =>
+          p.first_name.toLowerCase() === firstName.trim().toLowerCase() &&
+          p.last_name.toLowerCase() === lastName.trim().toLowerCase()
+      )
+      if (exactNameMatch) {
+        await continueWithPlayer(exactNameMatch, supabase)
+        return
+      }
+
+      // 2. Plusieurs joueurs partagent cet email (cas parent/enfants)
+      const byEmail = pool.filter((p) => p.email === emailNorm)
+      if (byEmail.length > 1) {
+        setEmailMatches(byEmail)
+        setEmailModalOpen(true)
+        return
+      }
+
+      // 3. Un seul joueur avec cet email
+      if (byEmail.length === 1) {
+        await continueWithPlayer(byEmail[0], supabase)
+        return
+      }
+
+      // 4. Aucun email match → chercher par ressemblance nom+prénom
+      const input = `${firstName.trim()} ${lastName.trim()}`.toLowerCase()
+      const best = pool
+        .map((p) => ({
+          player: p,
+          dist: leven.get(input, `${p.first_name} ${p.last_name}`.toLowerCase()),
+        }))
+        .sort((a, b) => a.dist - b.dist)[0]
+
+      if (best && best.dist < 3) {
+        setFuzzyCandidate(best.player)
+        setFuzzyModalOpen(true)
+        return
+      }
+
+      // 5. Aucun match
+      setError('introuvable')
+    } catch {
+      setError('Une erreur inattendue est survenue. Réessaie dans quelques instants.')
+    } finally {
+      // Toujours remettre loading à false, même en cas d'erreur ou d'exception
       setLoading(false)
-      return
     }
-
-    // 3. Un seul joueur avec cet email
-    if (byEmail.length === 1) {
-      await continueWithPlayer(byEmail[0], supabase)
-      return
-    }
-
-    // 4. Aucun email match → chercher par ressemblance nom+prénom
-    const input = `${firstName.trim()} ${lastName.trim()}`.toLowerCase()
-    const best = pool
-      .map((p) => ({
-        player: p,
-        dist: leven.get(input, `${p.first_name} ${p.last_name}`.toLowerCase()),
-      }))
-      .sort((a, b) => a.dist - b.dist)[0]
-
-    if (best && best.dist < 3) {
-      setFuzzyCandidate(best.player)
-      setFuzzyModalOpen(true)
-      setLoading(false)
-      return
-    }
-
-    // 5. Aucun match
-    setLoading(false)
-    setError('introuvable')
   }
 
   async function continueWithPlayer(player: Player, supabaseClient?: ReturnType<typeof createClient>) {
