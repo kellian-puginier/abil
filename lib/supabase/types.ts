@@ -40,13 +40,9 @@ export type IcDate = {
   label: string | null
 }
 
-export type BmAssignments = {
-  // Préparé pour V1.1 — structure libre pour l'instant
-  [teamCode: string]: {
-    roster: string[]   // player IDs
-    lineup: Record<string, string> // poste → player ID
-  }
-}
+// Importé depuis lineup-rules — défini là où est la logique métier
+import type { BmAssignments as BmAssignmentsType } from '@/lib/lineup-rules'
+export type BmAssignments = BmAssignmentsType
 
 export type Response = {
   id: string
