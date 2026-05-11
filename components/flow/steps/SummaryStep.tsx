@@ -9,6 +9,7 @@ import { useQuestionnaireStore } from '@/stores/questionnaire'
 import { createClient } from '@/lib/supabase/client'
 import { buildUpsertPayload } from '@/lib/flow-save'
 import type { Team, IcDate } from '@/lib/supabase/types'
+import type { BmAssignments } from '@/lib/lineup-rules'
 
 const DAY_LABELS: Record<string, string> = {
   saturday: 'Samedi', sunday: 'Dimanche', weekday: 'Semaine',
@@ -126,6 +127,27 @@ export function SummaryStep() {
                   ))}
                 </SectionCard>
               )}
+
+              {/* Badminton Manager */}
+              {store.didBm && store.bmAssignments && Object.keys(store.bmAssignments).length > 0 ? (
+                <SectionCard title="🎮 Badminton Manager" onEdit={() => router.push('/flow/badminton-manager')} stepId="badminton-manager">
+                  <BmSummaryBlock assignments={store.bmAssignments as BmAssignments} teamsMap={teamsMap} />
+                </SectionCard>
+              ) : (
+                <div className="rounded-2xl border border-dashed bg-muted/30 p-4 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">🎮 Badminton Manager</p>
+                    <p className="text-xs text-muted-foreground">Tu n'as pas encore proposé de compo.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/flow/badminton-manager')}
+                    className="shrink-0 text-xs font-semibold text-primary underline underline-offset-4"
+                  >
+                    Proposer
+                  </button>
+                </div>
+              )}
             </>
           )}
         </>
@@ -141,6 +163,24 @@ export function SummaryStep() {
           {submitting ? 'Envoi…' : '✅ Valider mon sondage'}
         </Button>
       </motion.div>
+    </div>
+  )
+}
+
+function BmSummaryBlock({ assignments, teamsMap }: {
+  assignments: BmAssignments
+  teamsMap: Record<string, Team>
+}) {
+  return (
+    <div className="space-y-2">
+      {Object.entries(assignments).map(([code, a]) => (
+        <div key={code} className="rounded-xl border bg-primary/5 px-3 py-2">
+          <p className="text-xs font-bold text-primary">{code} — {teamsMap[code]?.label ?? code}</p>
+          <p className="text-xs text-muted-foreground">
+            Effectif : {a.roster.length} joueur{a.roster.length > 1 ? 's' : ''}
+          </p>
+        </div>
+      ))}
     </div>
   )
 }

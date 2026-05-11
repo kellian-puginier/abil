@@ -137,6 +137,20 @@ export function validateLineup(lineup: Lineup, rosterMap: Map<string, Player>): 
   if (lineup.DMx1) { checkGender(lineup.DMx1[0], 'H', 'DMx1[H]'); checkGender(lineup.DMx1[1], 'F', 'DMx1[F]') }
   if (lineup.DMx2) { checkGender(lineup.DMx2[0], 'H', 'DMx2[H]'); checkGender(lineup.DMx2[1], 'F', 'DMx2[F]') }
 
+  // Un joueur ne peut pas faire SH1 ET SH2 (deux simples distincts)
+  if (lineup.SH1 && lineup.SH2 && lineup.SH1 === lineup.SH2)
+    errors.push('SH1 et SH2 doivent être deux joueurs différents')
+  if (lineup.SD1 && lineup.SD2 && lineup.SD1 === lineup.SD2)
+    errors.push('SD1 et SD2 doivent être deux joueuses différentes')
+
+  // Pour le mixte : pas le même joueur en DMx1 ET DMx2
+  if (lineup.DMx1 && lineup.DMx2) {
+    if (lineup.DMx1[0] && lineup.DMx1[0] === lineup.DMx2[0])
+      errors.push('DMx1 et DMx2 : le joueur H doit être différent dans chaque mixte')
+    if (lineup.DMx1[1] && lineup.DMx1[1] === lineup.DMx2[1])
+      errors.push('DMx1 et DMx2 : la joueuse F doit être différente dans chaque mixte')
+  }
+
   return { valid: errors.length === 0, errors }
 }
 
