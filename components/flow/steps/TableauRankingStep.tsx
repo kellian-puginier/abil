@@ -34,11 +34,10 @@ export function TableauRankingStep() {
     ? store.tableauRanking
     : ['simple', 'double', 'mixte']
 
-  const [items,    setItems]    = useState(initial)
-  const [useDnd,   setUseDnd]   = useState(true)   // false = mode podium (fallback)
-  const [podium,   setPodium]   = useState<[string,string,string]>([
-    initial[0] ?? '', initial[1] ?? '', initial[2] ?? '',
-  ])
+  const [items,  setItems]  = useState(initial)
+  const [useDnd, setUseDnd] = useState(true)
+  // Podium démarre toujours vide pour forcer un choix conscient
+  const [podium, setPodium] = useState<[string, string, string]>(['', '', ''])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -96,11 +95,11 @@ export function TableauRankingStep() {
       <button
         type="button"
         onClick={() => {
-          if (useDnd) {
-            // Initialiser le podium depuis l'ordre drag actuel
-            setPodium(items as [string,string,string])
-          } else {
-            setItems(Array.from(podium))
+          if (!useDnd) {
+            // Retour au DnD : si le podium est complet on l'utilise,
+            // sinon on repart de l'ordre par défaut pour éviter un crash
+            const allFilled = podium.every(Boolean) && new Set(podium).size === 3
+            setItems(allFilled ? Array.from(podium) : ['simple', 'double', 'mixte'])
           }
           setUseDnd((v) => !v)
         }}

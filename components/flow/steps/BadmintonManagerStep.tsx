@@ -48,7 +48,7 @@ function sortByRank(players: Player[]): Player[] {
   return [...players].sort((a, b) => bestRank(a) - bestRank(b))
 }
 
-type BmSubStep = 'team-pick' | 'roster' | 'lineup' | 'done'
+type BmSubStep = 'intro' | 'team-pick' | 'roster' | 'lineup' | 'done'
 
 export function BadmintonManagerStep() {
   const router = useRouter()
@@ -64,7 +64,12 @@ export function BadmintonManagerStep() {
   const [currentTeam, setCurrentTeam] = useState<string | null>(null)
   const [roster,      setRoster]      = useState<string[]>([])
   const [lineup,      setLineup]      = useState<Lineup>({ ...EMPTY_LINEUP })
-  const [subStep,     setSubStep]     = useState<BmSubStep>('team-pick')
+  // Démarrage sur l'intro, sauf si le joueur a déjà commencé (assignments non vide)
+  const [subStep, setSubStep] = useState<BmSubStep>(
+    Object.keys((store.bmAssignments as BmAssignments | null) ?? {}).length > 0
+      ? 'done'
+      : 'intro'
+  )
 
   useEffect(() => {
     const supabase = createClient()
@@ -181,6 +186,60 @@ export function BadmintonManagerStep() {
       </div>
 
       <AnimatePresence mode="wait">
+
+        {/* ── Intro ── */}
+        {subStep === 'intro' && (
+          <SubStepWrap key="intro">
+            <div className="space-y-5">
+              {/* Pitch */}
+              <div className="rounded-2xl border-2 border-primary/20 bg-primary/5 p-5 space-y-3">
+                <p className="font-semibold text-primary text-base">🎮 C'est quoi Badminton Manager ?</p>
+                <p className="text-sm text-muted-foreground">
+                  C'est un mini-jeu où <strong>tu proposes ta vision des équipes ABIL pour la saison prochaine</strong> :
+                  tu constitues un effectif de joueurs et tu places chacun sur un poste dans la compo type.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  La commission interclubs analysera toutes les propositions pour prendre les meilleures décisions.
+                  Ton avis compte vraiment !
+                </p>
+              </div>
+
+              {/* Infos pratiques */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border bg-card p-3 text-center">
+                  <p className="text-2xl">⏱️</p>
+                  <p className="text-xs font-semibold mt-1">~5 min</p>
+                  <p className="text-xs text-muted-foreground">par équipe</p>
+                </div>
+                <div className="rounded-xl border bg-card p-3 text-center">
+                  <p className="text-2xl">💡</p>
+                  <p className="text-xs font-semibold mt-1">Facultatif</p>
+                  <p className="text-xs text-muted-foreground">mais très utile</p>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <Button size="lg" className="w-full" onClick={() => setSubStep('team-pick')}>
+                Lancer Badminton Manager 🚀
+              </Button>
+              <div className="rounded-xl border border-muted bg-muted/30 p-4 space-y-2">
+                <p className="text-sm text-muted-foreground text-center">
+                  Pas le temps maintenant ? Aucun problème.
+                </p>
+                <p className="text-sm text-muted-foreground text-center">
+                  Tu peux finir le questionnaire et revenir faire Badminton Manager plus tard en rouvrant ce lien avec ton email.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  className="w-full text-sm font-medium text-primary underline underline-offset-4"
+                >
+                  Passer et terminer le questionnaire →
+                </button>
+              </div>
+            </div>
+          </SubStepWrap>
+        )}
 
         {/* ── Sous-étape 1 : choix de l'équipe ── */}
         {subStep === 'team-pick' && (

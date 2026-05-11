@@ -86,72 +86,100 @@ export function SummaryStep() {
         <p className="text-sm text-muted-foreground">Vérifie et valide.</p>
       </div>
 
+      {/* Bandeau de confirmation — toujours visible */}
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary font-medium">
+        ✅ Toutes tes réponses sont bien enregistrées. Tu peux les modifier avant de valider.
+      </div>
+
+      {/* ── Licence ── */}
       <SectionCard title="Licence" onEdit={() => router.push('/flow/license')} stepId="license">
-        {store.stayingLicensed ? '✅ Je reste à l\'ABIL' : '❌ Pas de renouvellement'}
+        {store.stayingLicensed === true
+          ? '✅ Je reste à l\'ABIL'
+          : store.licensedUnsure
+          ? '🤔 Je ne sais pas encore'
+          : '❌ Pas de renouvellement'}
+        {store.reasonLeavingClub && (
+          <p className="mt-1 text-xs text-muted-foreground italic">"{store.reasonLeavingClub}"</p>
+        )}
       </SectionCard>
 
-      {store.stayingLicensed && (
+      {/* ── Interclubs (affiché si licence oui/incertain) ── */}
+      {(store.stayingLicensed === true || store.licensedUnsure) && (
+        <SectionCard title="Interclubs" onEdit={() => router.push('/flow/ic-engagement')} stepId="ic-engagement">
+          {store.doingInterclubs === true
+            ? '🔥 Je fais les IC'
+            : store.icUnsure
+            ? '🤔 Je ne sais pas encore'
+            : '⏭ Pas les IC cette année'}
+          {store.reasonNoIc && (
+            <p className="mt-1 text-xs text-muted-foreground italic">"{store.reasonNoIc}"</p>
+          )}
+        </SectionCard>
+      )}
+
+      {/* ── Préférences IC (tableaux, dispos…) — affiché si IC oui/incertain ── */}
+      {(store.doingInterclubs === true || store.icUnsure) &&
+       (store.stayingLicensed === true || store.licensedUnsure) && (
         <>
-          <SectionCard title="Interclubs" onEdit={() => router.push('/flow/ic-engagement')} stepId="ic-engagement">
-            {store.doingInterclubs ? '🔥 Je fais les IC' : '⏭ Pas les IC cette année'}
-          </SectionCard>
+          {store.tableauRanking.length > 0 && (
+            <SectionCard title="Tableaux" onEdit={() => router.push('/flow/tableau-ranking')} stepId="tableau-ranking">
+              {store.tableauRanking.map((t, i) => `${i + 1}. ${tableauLabels[t]}`).join(' — ')}
+            </SectionCard>
+          )}
 
-          {store.doingInterclubs && (
-            <>
-              <SectionCard title="Tableaux" onEdit={() => router.push('/flow/tableau-ranking')} stepId="tableau-ranking">
-                {store.tableauRanking.map((t, i) => `${i + 1}. ${tableauLabels[t]}`).join(' — ')}
-              </SectionCard>
+          {store.availability.length > 0 && (
+            <SectionCard title="Disponibilités" onEdit={() => router.push('/flow/availability')} stepId="availability">
+              {store.availability.map((a) => availLabels[a] ?? a).join(', ')}
+            </SectionCard>
+          )}
 
-              <SectionCard title="Disponibilités" onEdit={() => router.push('/flow/availability')} stepId="availability">
-                {store.availability.map((a) => availLabels[a] ?? a).join(', ')}
-              </SectionCard>
-
-              <SectionCard title="Format matchs" onEdit={() => router.push('/flow/match-format')} stepId="match-format">
-                <p>Par rencontre : {store.matchesPerEncounter || '—'}</p>
-                {store.matchesPerDay && (
-                  <p>Par journée : {decodeMatchesPerDay(store.matchesPerDay)}</p>
-                )}
-              </SectionCard>
-
-              <SectionCard title="Équipes souhaitées" onEdit={() => router.push('/flow/teams')} stepId="teams">
-                {store.preferredTeams.includes('any')
-                  ? '✨ Là où on a besoin de moi'
-                  : store.preferredTeams.map((code) => {
-                      const t = teamsMap[code]
-                      return t ? `${t.code} — ${t.label}` : code
-                    }).join(', ') || '—'
-                }
-              </SectionCard>
-
-              {unavailDates.length > 0 && (
-                <SectionCard title="Empêchements" onEdit={() => router.push('/flow/calendar')} stepId="calendar">
-                  {unavailDates.map((d) => (
-                    <p key={d.id}>{new Date(d.date).toLocaleDateString('fr-FR')}</p>
-                  ))}
-                </SectionCard>
+          {store.matchesPerEncounter && (
+            <SectionCard title="Format matchs" onEdit={() => router.push('/flow/match-format')} stepId="match-format">
+              <p>Par rencontre : {store.matchesPerEncounter}</p>
+              {store.matchesPerDay && (
+                <p>Par journée : {decodeMatchesPerDay(store.matchesPerDay)}</p>
               )}
+            </SectionCard>
+          )}
 
-              {/* Badminton Manager */}
-              {store.didBm && store.bmAssignments && Object.keys(store.bmAssignments).length > 0 ? (
-                <SectionCard title="🎮 Badminton Manager" onEdit={() => router.push('/flow/badminton-manager')} stepId="badminton-manager">
-                  <BmSummaryBlock assignments={store.bmAssignments as BmAssignments} teamsMap={teamsMap} />
-                </SectionCard>
-              ) : (
-                <div className="rounded-2xl border border-dashed bg-muted/30 p-4 flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium">🎮 Badminton Manager</p>
-                    <p className="text-xs text-muted-foreground">Tu n'as pas encore proposé de compo.</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => router.push('/flow/badminton-manager')}
-                    className="shrink-0 text-xs font-semibold text-primary underline underline-offset-4"
-                  >
-                    Proposer
-                  </button>
-                </div>
-              )}
-            </>
+          {store.preferredTeams.length > 0 && (
+            <SectionCard title="Équipes souhaitées" onEdit={() => router.push('/flow/teams')} stepId="teams">
+              {store.preferredTeams.includes('any')
+                ? '✨ Là où on a besoin de moi'
+                : store.preferredTeams.map((code) => {
+                    const t = teamsMap[code]
+                    return t ? `${t.code} — ${t.label}` : code
+                  }).join(', ')
+              }
+            </SectionCard>
+          )}
+
+          {unavailDates.length > 0 && (
+            <SectionCard title="Empêchements" onEdit={() => router.push('/flow/calendar')} stepId="calendar">
+              {unavailDates.map((d) => (
+                <p key={d.id}>{new Date(d.date).toLocaleDateString('fr-FR')}</p>
+              ))}
+            </SectionCard>
+          )}
+
+          {store.didBm && store.bmAssignments && Object.keys(store.bmAssignments).length > 0 ? (
+            <SectionCard title="🎮 Badminton Manager" onEdit={() => router.push('/flow/badminton-manager')} stepId="badminton-manager">
+              <BmSummaryBlock assignments={store.bmAssignments as BmAssignments} teamsMap={teamsMap} />
+            </SectionCard>
+          ) : (
+            <div className="rounded-2xl border border-dashed bg-muted/30 p-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium">🎮 Badminton Manager</p>
+                <p className="text-xs text-muted-foreground">Tu n'as pas encore proposé de compo.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push('/flow/badminton-manager')}
+                className="shrink-0 text-xs font-semibold text-primary underline underline-offset-4"
+              >
+                Proposer
+              </button>
+            </div>
           )}
         </>
       )}
