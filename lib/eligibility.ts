@@ -15,25 +15,25 @@ export type Availability = 'weekday' | 'saturday' | 'sunday' | 'anytime'
 /**
  * Retourne les équipes accessibles selon les créneaux disponibles.
  *
- * Règles métier :
- * - 'anytime' → tout débloquer
- * - sans 'saturday' → N2 désactivé (N2 = samedi)
- * - sans 'sunday'   → PN, R1, R2 désactivés (ils jouent le dimanche)
- * - uniquement 'weekday' → seules les équipes qui jouent en semaine (aucune actuellement)
+ * Créneaux réels des équipes ABIL :
+ *   Samedi   → N2
+ *   Dimanche → PN, R1, R2
+ *   Semaine  → PR, D1, D2, D3, D4, D5, D6
  */
 export function getEligibleTeamsForAvailability(availability: Availability[]): TeamCode[] {
   if (availability.includes('anytime')) {
     return ['N2', 'PN', 'R1', 'R2', 'PR', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6']
   }
 
-  const hasSat = availability.includes('saturday')
-  const hasSun = availability.includes('sunday')
+  const hasSat     = availability.includes('saturday')
+  const hasSun     = availability.includes('sunday')
+  const hasWeekday = availability.includes('weekday')
 
   const eligible: TeamCode[] = []
 
-  if (hasSat)             eligible.push('N2')
-  if (hasSun)             eligible.push('PN', 'R1', 'R2')
-  if (hasSat || hasSun)   eligible.push('PR', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6')
+  if (hasSat)     eligible.push('N2')
+  if (hasSun)     eligible.push('PN', 'R1', 'R2')
+  if (hasWeekday) eligible.push('PR', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6')
 
   return eligible
 }
