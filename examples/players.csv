@@ -1,0 +1,11 @@
+first_name,last_name,email,gender,ranking_simple,ranking_double,ranking_mixte,previous_team
+Lucas,Martin,lucas.martin@example.com,H,R6,R5,R6,R1
+Emma,Bernard,emma.bernard@example.com,F,D7,R6,D7,R2
+Thomas,Dubois,thomas.dubois@example.com,H,P12,P10,P11,PR
+Chloé,Leroy,chloe.leroy@example.com,F,D9,D8,D9,D1
+Antoine,Moreau,antoine.moreau@example.com,H,N3,N2,N3,N2
+Camille,Simon,camille.simon@example.com,F,R4,R3,R4,PN
+Julien,Laurent,julien.laurent@example.com,H,D5,D4,D5,D2
+Sophie,Michel,sophie.michel@example.com,F,P15,P13,P14,
+Nathan,David,nathan.david@example.com,H,R8,R7,R8,R2
+Léa,Fontaine,lea.fontaine@example.com,F,D6,R8,D7,D1

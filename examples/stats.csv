@@ -1,0 +1,11 @@
+email,matches_simple,matches_double,matches_mixte,partners,notes
+lucas.martin@example.com,8,6,4,Emma Bernard;Julien Laurent,Bonne saison - très régulier
+emma.bernard@example.com,5,6,4,Lucas Martin;Camille Simon,
+thomas.dubois@example.com,3,4,2,Nathan David,Absent sur plusieurs dates
+chloe.leroy@example.com,6,5,5,Sophie Michel;Léa Fontaine,
+antoine.moreau@example.com,10,8,6,Julien Laurent,Capitaine R1 cette saison
+camille.simon@example.com,4,5,4,Emma Bernard,
+julien.laurent@example.com,7,8,3,Lucas Martin;Antoine Moreau,
+sophie.michel@example.com,0,2,1,Chloé Leroy,Blessure en décembre - retour en mars
+nathan.david@example.com,5,4,3,Thomas Dubois,
+lea.fontaine@example.com,4,3,5,Chloé Leroy;Camille Simon,

@@ -1,0 +1,140 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* ── Fonts ─────────────────────────────────────────── */
+  --font-sans:    var(--font-barlow), system-ui, sans-serif;
+  --font-heading: var(--font-barlow-condensed), system-ui, sans-serif;
+  --font-mono:    ui-monospace, monospace;
+
+  /* ── Color tokens → CSS vars ───────────────────────── */
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+
+  /* ── Radius ─────────────────────────────────────────── */
+  --radius-sm:  calc(var(--radius) * 0.6);
+  --radius-md:  calc(var(--radius) * 0.8);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.4);
+}
+
+/* ══════════════════════════════════════════════════════
+   PALETTE ABIL — Bleu royal + Jaune shuttlecock
+   Source: ui-ux-pro-max → sports athletic blue yellow
+   ══════════════════════════════════════════════════════ */
+:root {
+  /* Bleu royal ABIL #2563EB → oklch */
+  --primary:            oklch(0.55 0.22 265);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Jaune shuttlecock #F59E0B → oklch */
+  --secondary:            oklch(0.78 0.17 83);
+  --secondary-foreground: oklch(0.13 0.02 265);
+
+  /* Surfaces */
+  --background:         oklch(0.98 0.005 245);   /* blanc légèrement bleuté */
+  --foreground:         oklch(0.13 0.02 265);    /* navy foncé #0F172A */
+  --card:               oklch(1 0 0);
+  --card-foreground:    oklch(0.13 0.02 265);
+  --popover:            oklch(1 0 0);
+  --popover-foreground: oklch(0.13 0.02 265);
+
+  /* Muted — bleu très pâle */
+  --muted:              oklch(0.96 0.015 245);
+  --muted-foreground:   oklch(0.50 0.04 245);
+
+  /* Accent — bleu clair hover */
+  --accent:             oklch(0.93 0.03 265);
+  --accent-foreground:  oklch(0.25 0.05 265);
+
+  --destructive:  oklch(0.57 0.24 27);
+  --border:       oklch(0.91 0.02 245);
+  --input:        oklch(0.91 0.02 245);
+  --ring:         oklch(0.55 0.22 265);
+  --radius:       0.75rem;
+}
+
+/* ══════════════════════════════════════════════════════
+   BASE STYLES
+   ══════════════════════════════════════════════════════ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-barlow), system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Headings → Barlow Condensed, bold & spacieux */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-barlow-condensed), system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); }
+  h2 { font-size: clamp(1.4rem, 4vw, 2rem); }
+  h3 { font-size: clamp(1.1rem, 3vw, 1.5rem); }
+}
+
+/* ══════════════════════════════════════════════════════
+   UTILITY CLASSES ABIL
+   ══════════════════════════════════════════════════════ */
+@layer utilities {
+  /* Titre display sport */
+  .font-display {
+    font-family: var(--font-barlow-condensed), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  /* Glassmorphism léger */
+  .glass {
+    background: oklch(1 0 0 / 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid oklch(0.91 0.02 245 / 0.6);
+  }
+
+  /* Gradient hero ABIL */
+  .bg-abil-hero {
+    background: linear-gradient(
+      135deg,
+      oklch(0.42 0.22 265) 0%,
+      oklch(0.55 0.22 265) 50%,
+      oklch(0.48 0.20 255) 100%
+    );
+  }
+
+  /* Halo jaune derrière le logo */
+  .badge-yellow {
+    background: oklch(0.78 0.17 83);
+    color: oklch(0.13 0.02 265);
+  }
+}
