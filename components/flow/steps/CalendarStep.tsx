@@ -82,7 +82,16 @@ export function CalendarStep() {
       </div>
 
       {dates.length === 0 && (
-        <p className="text-muted-foreground">Aucune date encore publiée.</p>
+        <div className="rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 p-5 space-y-2 text-center">
+          <p className="text-2xl">📅</p>
+          <p className="font-semibold text-primary">Calendrier en cours de construction</p>
+          <p className="text-sm text-muted-foreground">
+            Les dates des rencontres IC 2025-2026 n'ont pas encore été publiées — elles seront ajoutées par l'admin une fois les engagements confirmés auprès de la fédération.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Cette section te permettra de signaler tes empêchements sur les dates connues. Passe à la suite pour terminer ton sondage !
+          </p>
+        </div>
       )}
 
       <div className="space-y-3">

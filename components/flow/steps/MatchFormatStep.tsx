@@ -11,18 +11,32 @@ import { buildUpsertPayload } from '@/lib/flow-save'
 import { cn } from '@/lib/utils'
 import type { Availability } from '@/lib/eligibility'
 
-const PER_ENCOUNTER = ['1', '2', 'Peu importe']
-const COUNTS = ['1', '2', '3', '4']
+const PER_ENCOUNTER_OPTIONS = [
+  { value: '1',           label: '1 match' },
+  { value: '2',           label: '2 matchs' },
+  { value: 'Peu importe', label: 'Peu importe' },
+]
 
-/**
- * Décode une valeur "max:2" / "min:3" / "any" pour l'affichage dans le récap.
- * Exporté pour être réutilisé dans SummaryStep.
- */
+// Grille unifiée pour "par journée" : maxi 1-4 + mini 1-4 + peu importe
+// Format stocké : "max:2" | "min:3" | "any"
+const PER_DAY_OPTIONS = [
+  { value: 'max:1', label: '1 match maxi' },
+  { value: 'max:2', label: '2 matchs maxi' },
+  { value: 'max:3', label: '3 matchs maxi' },
+  { value: 'max:4', label: '4 matchs maxi' },
+  { value: 'min:1', label: '1 match mini' },
+  { value: 'min:2', label: '2 matchs mini' },
+  { value: 'min:3', label: '3 matchs mini' },
+  { value: 'min:4', label: '4 matchs mini' },
+  { value: 'any',   label: 'Peu importe' },
+]
+
 export function decodeMatchesPerDay(raw: string): string {
   if (!raw || raw === 'any') return 'Peu importe'
   const [type, count] = raw.split(':')
-  if (type === 'max') return `Maximum ${count} match${parseInt(count) > 1 ? 's' : ''}`
-  if (type === 'min') return `Minimum ${count} match${parseInt(count) > 1 ? 's' : ''}`
+  const n = parseInt(count)
+  if (type === 'max') return `${n} match${n > 1 ? 's' : ''} maximum`
+  if (type === 'min') return `${n} match${n > 1 ? 's' : ''} minimum`
   return raw
 }
 
@@ -31,118 +45,83 @@ export function MatchFormatStep() {
   const store  = useQuestionnaireStore()
 
   const [perEncounter, setPerEncounter] = useState(store.matchesPerEncounter)
-
-  // Décoder l'état initial depuis "max:2" / "min:3" / "any"
-  const parsedDay = parsePerDay(store.matchesPerDay)
-  const [dayType,  setDayType]  = useState<'max' | 'min' | 'any'>(parsedDay.type)
-  const [dayCount, setDayCount] = useState<string>(parsedDay.count)
+  const [perDay,       setPerDay]       = useState(store.matchesPerDay)
 
   const showPerDay = canAskMatchesPerDay(store.availability as Availability[])
-
-  // "any" n'a pas besoin d'un count
-  const dayValid = dayType === 'any' || dayCount !== ''
+  const canNext = !!perEncounter && (!showPerDay || !!perDay)
 
   async function handleNext() {
-    if (!perEncounter) return
-    if (showPerDay && !dayValid) return
-
-    const perDay = dayType === 'any' ? 'any' : `${dayType}:${dayCount}`
-
+    if (!canNext) return
     store.patchResponse({ matchesPerEncounter: perEncounter, matchesPerDay: perDay } as any)
     store.setCurrentStep(7)
     const supabase = createClient()
     await supabase.from('responses').upsert(
-      {
-        ...buildUpsertPayload({ ...store, matchesPerEncounter: perEncounter, matchesPerDay: perDay }),
-        current_step: 7,
-      },
+      { ...buildUpsertPayload({ ...store, matchesPerEncounter: perEncounter, matchesPerDay: perDay }), current_step: 7 },
       { onConflict: 'player_id' }
     )
-    const next = getNextStep('match-format', store)
-    router.push(`/flow/${next ?? 'partners'}`)
+    router.push(`/flow/${getNextStep('match-format', store) ?? 'partners'}`)
   }
 
   return (
     <div className="flex flex-1 flex-col justify-center space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Format des matchs ⚡</h1>
-      </div>
+      <h1 className="text-2xl font-bold">Format des matchs ⚡</h1>
 
-      {/* Matchs par rencontre */}
+      {/* Par rencontre */}
       <div className="space-y-3">
         <p className="font-medium">Lors d'une rencontre, je peux jouer :</p>
         <div className="grid grid-cols-3 gap-3">
-          {PER_ENCOUNTER.map((v) => (
-            <RadioTile
-              key={v}
-              label={v === 'Peu importe' ? 'Peu importe' : `${v} match${v === '2' ? 's' : ''}`}
-              selected={perEncounter === v}
-              onClick={() => setPerEncounter(v)}
-            />
+          {PER_ENCOUNTER_OPTIONS.map(({ value, label }) => (
+            <Tile key={value} label={label} selected={perEncounter === value} onClick={() => setPerEncounter(value)} />
           ))}
         </div>
       </div>
 
-      {/* Matchs par journée (R1 / R2 / PN uniquement) */}
+      {/* Par journée — grille unifiée maxi/mini */}
       {showPerDay && (
         <div className="space-y-3">
-          <p className="font-medium">
-            Lors d'une journée complète{' '}
-            <span className="text-sm font-normal text-muted-foreground">
-              (R1 / R2 / Pré-Nationale)
-            </span>{' '}
-            je souhaite jouer :
-          </p>
-
-          {/* Type : max / min / peu importe */}
-          <div className="grid grid-cols-3 gap-2">
-            {(['max', 'min', 'any'] as const).map((t) => (
-              <RadioTile
-                key={t}
-                label={t === 'max' ? 'Au maximum' : t === 'min' ? 'Au minimum' : 'Peu importe'}
-                selected={dayType === t}
-                onClick={() => { setDayType(t); if (t === 'any') setDayCount('') }}
-              />
-            ))}
+          <div>
+            <p className="font-medium">Lors d'une journée complète <span className="text-sm font-normal text-muted-foreground">(R1 / R2 / Pré-Nationale)</span></p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Choisis le nombre de matchs que tu veux jouer, et si c'est un maximum ou un minimum.
+            </p>
           </div>
-
-          {/* Nombre : affiché uniquement si max ou min sélectionné */}
-          {dayType !== 'any' && (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                {dayType === 'max' ? 'Maximum' : 'Minimum'} :
-              </p>
-              <div className="grid grid-cols-4 gap-2">
-                {COUNTS.map((n) => (
-                  <RadioTile
-                    key={n}
-                    label={`${n} match${parseInt(n) > 1 ? 's' : ''}`}
-                    selected={dayCount === n}
-                    onClick={() => setDayCount(n)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-2">
+            {PER_DAY_OPTIONS.map(({ value, label }) => {
+              const isMax = value.startsWith('max:')
+              const isMin = value.startsWith('min:')
+              return (
+                <Tile
+                  key={value}
+                  label={label}
+                  selected={perDay === value}
+                  onClick={() => setPerDay(value)}
+                  accent={isMax ? 'blue' : isMin ? 'yellow' : 'neutral'}
+                  wide={value === 'any'}
+                />
+              )
+            })}
+          </div>
+          {/* Légende */}
+          <div className="flex gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-primary inline-block" />Maxi = je joue au plus X matchs</span>
+            <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-secondary inline-block" />Mini = je joue au moins X matchs</span>
+          </div>
         </div>
       )}
 
-      <Button
-        size="lg"
-        className="h-14 w-full text-base"
-        onClick={handleNext}
-        disabled={!perEncounter || (showPerDay && !dayValid)}
-      >
+      <Button size="lg" className="h-14 w-full text-base" onClick={handleNext} disabled={!canNext}>
         Suivant →
       </Button>
     </div>
   )
 }
 
-function RadioTile({ label, selected, onClick }: {
+function Tile({ label, selected, onClick, accent = 'neutral', wide = false }: {
   label: string
   selected: boolean
   onClick: () => void
+  accent?: 'blue' | 'yellow' | 'neutral'
+  wide?: boolean
 }) {
   return (
     <button
@@ -150,20 +129,19 @@ function RadioTile({ label, selected, onClick }: {
       onClick={onClick}
       className={cn(
         'rounded-2xl border p-3 text-center text-sm transition-colors',
+        wide && 'col-span-2',
         selected
-          ? 'border-primary bg-primary text-primary-foreground font-semibold'
-          : 'border-border bg-card hover:border-primary/40'
+          ? accent === 'yellow'
+            ? 'border-secondary bg-secondary text-secondary-foreground font-semibold'
+            : 'border-primary bg-primary text-primary-foreground font-semibold'
+          : accent === 'blue'
+            ? 'border-primary/20 bg-primary/5 hover:border-primary/40'
+            : accent === 'yellow'
+            ? 'border-secondary/30 bg-secondary/10 hover:border-secondary/50'
+            : 'border-border bg-card hover:border-primary/30'
       )}
     >
       {label}
     </button>
   )
-}
-
-function parsePerDay(raw: string): { type: 'max' | 'min' | 'any'; count: string } {
-  if (!raw || raw === 'any' || raw === 'Peu importe') return { type: 'any', count: '' }
-  const [type, count] = raw.split(':')
-  if (type === 'max' || type === 'min') return { type, count: count ?? '' }
-  // Anciens formats "1"/"2"/… → on suppose "max"
-  return { type: 'max', count: raw }
 }

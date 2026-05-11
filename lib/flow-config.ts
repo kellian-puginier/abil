@@ -30,48 +30,52 @@ export const flowSteps: StepConfig[] = [
   },
   {
     id: 'ic-engagement',
-    // Affiché seulement si le joueur renouvelle sa licence
-    condition: (s) => s.stayingLicensed === true,
+    // Affiché si le joueur renouvelle OU s'il est incertain sur sa licence
+    condition: (s) => s.stayingLicensed === true || s.licensedUnsure === true,
   },
   {
     id: 'tableau-ranking',
-    condition: (s) => s.stayingLicensed === true && s.doingInterclubs === true,
+    condition: (s) => wantsIc(s),
   },
   {
     id: 'availability',
-    condition: (s) => s.stayingLicensed === true && s.doingInterclubs === true,
+    condition: (s) => wantsIc(s),
   },
   {
     id: 'match-format',
-    condition: (s) => s.stayingLicensed === true && s.doingInterclubs === true,
+    condition: (s) => wantsIc(s),
   },
   {
     id: 'partners',
     condition: (s) =>
-      s.stayingLicensed === true &&
-      s.doingInterclubs === true &&
-      // Affiché si double ou mixte est dans le top 2 du classement tableaux
-      (s.tableauRanking?.indexOf('double') ?? 3) < 2 ||
-      (s.tableauRanking?.indexOf('mixte') ?? 3) < 2,
+      wantsIc(s) &&
+      ((s.tableauRanking?.indexOf('double') ?? 3) < 2 ||
+       (s.tableauRanking?.indexOf('mixte') ?? 3) < 2),
   },
   {
     id: 'teams',
-    condition: (s) => s.stayingLicensed === true && s.doingInterclubs === true,
+    condition: (s) => wantsIc(s),
   },
   {
     id: 'badminton-manager',
-    // Placeholder V1 — toujours affiché si IC oui
-    condition: (s) => s.stayingLicensed === true && s.doingInterclubs === true,
+    condition: (s) => wantsIc(s),
   },
   {
     id: 'calendar',
-    condition: (s) => s.stayingLicensed === true && s.doingInterclubs === true,
+    condition: (s) => wantsIc(s),
   },
   {
     id: 'summary',
     condition: () => true,
   },
 ]
+
+/** Vrai si le joueur fait les IC (oui ou incertain). */
+function wantsIc(s: QuestionnaireState): boolean {
+  const wantsLicense = s.stayingLicensed === true || s.licensedUnsure === true
+  const wantsIcStep  = s.doingInterclubs === true || s.icUnsure === true
+  return wantsLicense && wantsIcStep
+}
 
 /** Retourne les IDs des steps actifs pour un état donné. */
 export function getActiveSteps(state: QuestionnaireState): string[] {

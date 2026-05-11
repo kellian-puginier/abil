@@ -19,13 +19,15 @@ export type QuestionnaireState = {
   // Étape 2 : bilan
   seasonFeedback: string
 
-  // Étape 3 : licence
+  // Étape 3 : licence  (null = incertain)
   stayingLicensed: boolean | null
-  reasonLeavingClub: string
+  licensedUnsure: boolean        // true si "je ne sais pas encore"
+  reasonLeavingClub: string      // raison du départ OU raison du doute
 
-  // Étape 4 : IC
+  // Étape 4 : IC  (null = incertain)
   doingInterclubs: boolean | null
-  reasonNoIc: string
+  icUnsure: boolean              // true si "je ne sais pas encore"
+  reasonNoIc: string             // raison du refus OU raison du doute
 
   // Étape 5 : tableaux
   tableauRanking: string[]   // ['simple','double','mixte'] ordonnés
@@ -77,8 +79,10 @@ const initialState = {
   clientToken: null,
   seasonFeedback: '',
   stayingLicensed: null,
+  licensedUnsure: false,
   reasonLeavingClub: '',
   doingInterclubs: null,
+  icUnsure: false,
   reasonNoIc: '',
   tableauRanking: [],
   availability: [],
@@ -115,8 +119,10 @@ export const useQuestionnaireStore = create<QuestionnaireState>()(
           currentStep: response.current_step,
           seasonFeedback: response.season_feedback ?? '',
           stayingLicensed: response.staying_licensed,
+          licensedUnsure: response.staying_licensed === null && !!response.reason_leaving_club,
           reasonLeavingClub: response.reason_leaving_club ?? '',
           doingInterclubs: response.doing_interclubs,
+          icUnsure: response.doing_interclubs === null && !!response.reason_no_ic,
           reasonNoIc: response.reason_no_ic ?? '',
           tableauRanking: response.tableau_ranking ?? [],
           availability: response.availability ?? [],
