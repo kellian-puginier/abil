@@ -74,7 +74,7 @@ export default function AccueilPage() {
             transition={{ duration: 0.4 }}
           >
             <span className="badge-yellow inline-block rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest">
-              Saison 2025 – 2026
+              Saison 2026 – 2027
             </span>
           </motion.div>
 

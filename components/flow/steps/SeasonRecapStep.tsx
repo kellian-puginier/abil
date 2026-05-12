@@ -8,6 +8,7 @@ import { useQuestionnaireStore } from '@/stores/questionnaire'
 import { getNextStep } from '@/lib/flow-config'
 import { createClient } from '@/lib/supabase/client'
 import { buildUpsertPayload } from '@/lib/flow-save'
+import { resolvePreviousTeams } from '@/lib/previous-teams'
 
 export function SeasonRecapStep() {
   const router = useRouter()
@@ -45,7 +46,9 @@ export function SeasonRecapStep() {
           <>
             <p className="text-base">
               Cette saison, tu as porté nos couleurs en{' '}
-              <strong className="text-primary">{player.previous_teams.join(' & ')}</strong> 🏸
+              <strong className="text-primary">
+                {resolvePreviousTeams(player.previous_teams).join(' & ')}
+              </strong> 🏸
             </p>
             {playerStats && (
               <div className="grid grid-cols-3 gap-3">

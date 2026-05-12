@@ -18,7 +18,7 @@ const barlowCondensed = Barlow_Condensed({
 })
 
 export const metadata: Metadata = {
-  title: 'Sondage Interclubs ABIL 2025-2026',
+  title: 'Sondage Interclubs ABIL 2026-2027',
   description: "Sondage de projection pour la saison interclubs de l'Association Bad In Lez",
   metadataBase: new URL('https://abil-survey.vercel.app'),
 }

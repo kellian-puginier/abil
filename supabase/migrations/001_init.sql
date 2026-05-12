@@ -127,17 +127,18 @@ create policy "responses_update_public" on responses for update using (true);
 -- SEED : équipes
 -- ============================================================
 
--- Créneaux réels ABIL : samedi=N2, dimanche=PN/R1/R2, soirée semaine=PR/D1-D6
+-- Équipes ABIL saison 2026-2027
+-- Samedi : N2 | Dimanche : PN, R1, R2 | Soirée semaine : PR, D2-D6
+-- (N3 présent en 2025-2026 mais pas reconduit ; D1 non engagé)
 insert into teams (code, label, level_order, play_days) values
   ('N2', 'Nationale 2',       1,  '{saturday}'),
   ('PN', 'Pré-Nationale',     2,  '{sunday}'),
   ('R1', 'Régionale 1',       3,  '{sunday}'),
   ('R2', 'Régionale 2',       4,  '{sunday}'),
   ('PR', 'Pré-Régionale',     5,  '{weekday}'),
-  ('D1', 'Départementale 1',  6,  '{weekday}'),
-  ('D2', 'Départementale 2',  7,  '{weekday}'),
-  ('D3', 'Départementale 3',  8,  '{weekday}'),
-  ('D4', 'Départementale 4',  9,  '{weekday}'),
-  ('D5', 'Départementale 5',  10, '{weekday}'),
-  ('D6', 'Départementale 6',  11, '{weekday}')
+  ('D2', 'Départementale 2',  6,  '{weekday}'),
+  ('D3', 'Départementale 3',  7,  '{weekday}'),
+  ('D4', 'Départementale 4',  8,  '{weekday}'),
+  ('D5', 'Départementale 5',  9,  '{weekday}'),
+  ('D6', 'Départementale 6',  10, '{weekday}')
 on conflict (code) do nothing;
