@@ -370,7 +370,7 @@ function DetailContent({
           <>
             <Row label="Équipes proposées" value={Object.keys(r.bm_assignments).join(', ')} />
             {Object.entries(r.bm_assignments).map(([code, a]) => (
-              <Row key={code} label={code} value={`${a.roster.length} joueur(s) — ${a.lineup.filter(Boolean).length} slot(s) rempli(s)`} />
+              <Row key={code} label={code} value={`${a.roster.length} joueur(s) — ${Object.values(a.lineup).filter(Boolean).length} slot(s) rempli(s)`} />
             ))}
           </>
         ) : (
