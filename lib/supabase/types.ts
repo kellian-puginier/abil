@@ -40,6 +40,24 @@ export type IcDate = {
   label: string | null
 }
 
+export type CharterArticle = {
+  id: string
+  order_num: number
+  title: string
+  content: string
+  created_at: string
+  updated_at: string
+}
+
+export type IcEvent = {
+  id: string
+  title: string
+  date: string   // ISO date
+  team_codes: string[]
+  description: string | null
+  created_at: string
+}
+
 // Importé depuis lineup-rules — défini là où est la logique métier
 import type { BmAssignments as BmAssignmentsType } from '@/lib/lineup-rules'
 export type BmAssignments = BmAssignmentsType
@@ -66,6 +84,17 @@ export type Response = {
   preferred_teams: string[] | null       // team codes ou ['any']
   unavailable_dates: string[] | null     // ic_date UUIDs
   date_comments: Record<string, string> | null
+
+  charter_consent: boolean | null
+  wants_captain: string | null       // 'yes' | 'no' | 'if_needed'
+  ic_role: string | null             // 'titulaire' | 'remplacant' | 'peu_importe'
+  tshirt_has: string[] | null        // ['bleu'] | ['jaune'] | ['les_deux'] | ['none']
+  tshirt_model: string | null        // 'homme' | 'femme'
+  tshirt_size: string | null         // 'XS'..'3XL'
+  formations_interest: string[] | null
+  stage_availability: Record<string, string> | null  // { event_id: 'yes'|'no'|'uncertain' }
+  cohesion_text: string | null
+  cohesion_date: string | null
 
   did_bm: boolean
   bm_assignments: BmAssignments | null

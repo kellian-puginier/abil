@@ -8,10 +8,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   // La page login gère sa propre logique — on ne redirect pas depuis le layout
   const navLinks = [
-    { href: '/admin', label: 'Dashboard' },
-    { href: '/admin/players', label: 'Joueurs' },
-    { href: '/admin/stats', label: 'Stats saison' },
+    { href: '/admin',          label: 'Dashboard' },
+    { href: '/admin/players',  label: 'Joueurs' },
+    { href: '/admin/stats',    label: 'Stats saison' },
+    { href: '/admin/charter',  label: 'Charte IC' },
     { href: '/admin/ic-dates', label: 'Dates IC' },
+    { href: '/admin/ic-events', label: 'Événements' },
     { href: '/admin/responses', label: 'Réponses' },
     { href: '/admin/bm-stats', label: 'BM Stats' },
   ]

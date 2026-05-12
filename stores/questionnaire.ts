@@ -39,12 +39,32 @@ export type QuestionnaireState = {
   matchesPerEncounter: string
   matchesPerDay: string
 
+  // Charte du joueur
+  charterConsent: boolean | null
+
+  // Capitaine + rôle IC
+  wantsCaptain: string        // 'yes' | 'no' | 'if_needed'
+  icRole: string              // 'titulaire' | 'remplacant' | 'peu_importe'
+
   // Étape 8 : partenaires
-  doublePartners: string[]   // player UUIDs
+  doublePartners: string[]
   mixtePartners: string[]
 
   // Étape 9 : équipes
-  preferredTeams: string[]   // team codes ou ['any']
+  preferredTeams: string[]
+
+  // T-shirt
+  tshirtHas: string[]         // ['bleu'] | ['jaune'] | ['les_deux'] | ['none']
+  tshirtModel: string         // 'homme' | 'femme'
+  tshirtSize: string          // 'XS'..'3XL'
+
+  // Formations
+  formationsInterest: string[]
+
+  // Stage de reprise + Cohésion
+  stageAvailability: Record<string, string>  // { event_id: 'yes'|'no'|'uncertain' }
+  cohesionText: string
+  cohesionDate: string
 
   // Étape 11 : calendrier
   unavailableDates: string[]             // ic_date UUIDs
@@ -84,6 +104,9 @@ const initialState = {
   doingInterclubs: null,
   icUnsure: false,
   reasonNoIc: '',
+  charterConsent: null,
+  wantsCaptain: '',
+  icRole: '',
   tableauRanking: [],
   availability: [],
   matchesPerEncounter: '',
@@ -91,6 +114,13 @@ const initialState = {
   doublePartners: [],
   mixtePartners: [],
   preferredTeams: [],
+  tshirtHas: [],
+  tshirtModel: '',
+  tshirtSize: '',
+  formationsInterest: [],
+  stageAvailability: {},
+  cohesionText: '',
+  cohesionDate: '',
   unavailableDates: [],
   dateComments: {},
   didBm: false,
@@ -124,6 +154,9 @@ export const useQuestionnaireStore = create<QuestionnaireState>()(
           doingInterclubs: response.doing_interclubs,
           icUnsure: response.doing_interclubs === null && !!response.reason_no_ic,
           reasonNoIc: response.reason_no_ic ?? '',
+          charterConsent: response.charter_consent,
+          wantsCaptain: response.wants_captain ?? '',
+          icRole: response.ic_role ?? '',
           tableauRanking: response.tableau_ranking ?? [],
           availability: response.availability ?? [],
           matchesPerEncounter: response.matches_per_encounter ?? '',
@@ -131,6 +164,13 @@ export const useQuestionnaireStore = create<QuestionnaireState>()(
           doublePartners: response.double_partners ?? [],
           mixtePartners: response.mixte_partners ?? [],
           preferredTeams: response.preferred_teams ?? [],
+          tshirtHas: response.tshirt_has ?? [],
+          tshirtModel: response.tshirt_model ?? '',
+          tshirtSize: response.tshirt_size ?? '',
+          formationsInterest: response.formations_interest ?? [],
+          stageAvailability: (response.stage_availability as Record<string, string>) ?? {},
+          cohesionText: response.cohesion_text ?? '',
+          cohesionDate: response.cohesion_date ?? '',
           unavailableDates: response.unavailable_dates ?? [],
           dateComments: response.date_comments ?? {},
           didBm: response.did_bm,
