@@ -86,7 +86,7 @@ export function CalendarStep() {
           <p className="text-2xl">📅</p>
           <p className="font-semibold text-primary">Calendrier en cours de construction</p>
           <p className="text-sm text-muted-foreground">
-            Les dates des rencontres IC 2025-2026 n'ont pas encore été publiées — elles seront ajoutées par l'admin une fois les engagements confirmés auprès de la fédération.
+            Les dates des rencontres IC 2026-2027 n'ont pas encore été publiées — elles seront ajoutées par l'admin une fois les engagements confirmés auprès de la fédération.
           </p>
           <p className="text-sm text-muted-foreground">
             Cette section te permettra de signaler tes empêchements sur les dates connues. Passe à la suite pour terminer ton sondage !

@@ -75,7 +75,7 @@ export function LicenseStep() {
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">Ta licence 🎽</h1>
         <p className="text-muted-foreground">
-          Tu comptes te réinscrire à l'ABIL pour 2025-2026 ?
+          Tu comptes te réinscrire à l'ABIL pour 2026-2027 ?
         </p>
       </div>
 
