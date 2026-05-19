@@ -26,7 +26,7 @@ const ROLE_LABELS: Record<string, string> = {
   titulaire: 'Titulaire 🏆', remplacant: 'Remplaçant(e) 🔄', peu_importe: 'Peu importe ✨',
 }
 const TSHIRT_LABELS: Record<string, string> = {
-  bleu: 'Le bleu 🔵', jaune: 'Le jaune 🟡', les_deux: 'Les deux 🔵🟡', none: 'Aucun',
+  bleu: 'Maillot bleu 🔵', jaune: 'Maillot jaune 🟡', bleu_uni: 'Maillot pour tous 🔵', les_deux: 'Bleu + jaune 🔵🟡', none: 'Aucun',
 }
 const FORMATION_LABELS: Record<string, string> = {
   table: 'Gestion de compétitions (Table/Badnet)',

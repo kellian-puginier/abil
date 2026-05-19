@@ -30,7 +30,7 @@ const ROLE_LABELS: Record<string, string> = {
   titulaire: 'Titulaire', remplacant: 'Remplaçant(e)', peu_importe: 'Peu importe',
 }
 const TSHIRT_LABELS: Record<string, string> = {
-  bleu: 'Bleu', jaune: 'Jaune', les_deux: 'Les deux', none: 'Aucun',
+  bleu: 'Maillot bleu', jaune: 'Maillot jaune', bleu_uni: 'Maillot pour tous', les_deux: 'Bleu + jaune', none: 'Aucun',
 }
 const FORMATION_LABELS: Record<string, string> = {
   table: 'Table/Badnet', arbitrage: "Arbitrage", ja: 'Juge Arbitre', jamais: 'Jamais',
