@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 import { useQuestionnaireStore } from '@/stores/questionnaire'
+import { getActiveSteps } from '@/lib/flow-config'
 import type { Player, PlayerStats, Response } from '@/lib/supabase/types'
 
 export default function AccueilPage() {
@@ -49,7 +50,12 @@ export default function AccueilPage() {
     }
 
     hydrateFromDb(response, player, stats ?? null)
-    const targetStep = response.completed ? 'summary' : getStepIdFromIndex(response.current_step)
+    // Utilise le vrai flow config pour résoudre l'index → step ID
+    const state = useQuestionnaireStore.getState()
+    const activeStepIds = getActiveSteps(state)
+    const targetStep = response.completed
+      ? 'summary'
+      : activeStepIds[response.current_step] ?? activeStepIds[activeStepIds.length - 2] ?? 'identify'
     router.push(`/flow/${targetStep}`)
   }
 
@@ -192,11 +198,3 @@ export default function AccueilPage() {
   )
 }
 
-function getStepIdFromIndex(index: number): string {
-  const steps = [
-    'identify', 'season-recap', 'license', 'ic-engagement',
-    'tableau-ranking', 'availability', 'match-format', 'partners',
-    'teams', 'badminton-manager', 'calendar', 'summary',
-  ]
-  return steps[index] ?? 'identify'
-}

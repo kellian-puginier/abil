@@ -11,8 +11,9 @@ import { useQuestionnaireStore } from '@/stores/questionnaire'
 import { getNextStep } from '@/lib/flow-config'
 import { createClient } from '@/lib/supabase/client'
 import { buildUpsertPayload } from '@/lib/flow-save'
+import { hasIcDownstreamData, IC_ALL_RESET } from '@/lib/flow-nav'
 
-type Choice = 'yes' | 'no' | 'unsure' | null
+type Choice = 'yes' | 'no' | 'no-warn' | 'unsure' | null
 
 export function LicenseStep() {
   const router = useRouter()
@@ -38,8 +39,19 @@ export function LicenseStep() {
     setTimeout(() => router.push(`/flow/${next ?? 'ic-engagement'}`), 1400)
   }
 
-  async function handleNo() {
-    store.patchResponse({ stayingLicensed: false, licensedUnsure: false } as any)
+  function handleNo() {
+    // Si le joueur a déjà rempli des infos IC, on l'avertit avant d'effacer
+    if (hasIcDownstreamData(store)) {
+      setChoice('no-warn')
+    } else {
+      store.patchResponse({ stayingLicensed: false, licensedUnsure: false } as any)
+      setChoice('no')
+    }
+  }
+
+  function confirmNoWithReset() {
+    // Confirme le changement critique : efface tout ce qui suit
+    store.patchResponse({ stayingLicensed: false, licensedUnsure: false, ...IC_ALL_RESET } as any)
     setChoice('no')
   }
 
@@ -65,7 +77,7 @@ export function LicenseStep() {
   async function save(patch: Record<string, unknown>) {
     const supabase = createClient()
     await supabase.from('responses').upsert(
-      { ...buildUpsertPayload({ ...store, ...patch } as any), current_step: 3 },
+      { ...buildUpsertPayload({ ...store, ...patch } as any), current_step: Math.max(store.currentStep, 3) },
       { onConflict: 'player_id' }
     )
   }
@@ -80,6 +92,8 @@ export function LicenseStep() {
       </div>
 
       <AnimatePresence mode="wait">
+
+        {/* Choix initial */}
         {choice === null && (
           <motion.div key="choices" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
             <Button size="lg" className="h-14 w-full text-base" onClick={handleYes}>
@@ -94,6 +108,7 @@ export function LicenseStep() {
           </motion.div>
         )}
 
+        {/* Confirmation "Oui" */}
         {choice === 'yes' && showConfetti && (
           <motion.div key="yes-msg" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl border bg-primary/5 p-6 text-center">
             <p className="text-lg font-bold text-primary">🎉 Super !</p>
@@ -101,6 +116,35 @@ export function LicenseStep() {
           </motion.div>
         )}
 
+        {/* Avertissement changement critique */}
+        {choice === 'no-warn' && (
+          <motion.div key="no-warn" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <div className="rounded-xl border-2 border-destructive/30 bg-destructive/5 p-4 space-y-2">
+              <p className="font-semibold text-destructive">⚠️ Attention</p>
+              <p className="text-sm text-muted-foreground">
+                Tu as déjà rempli des informations pour les interclubs. En confirmant que tu ne
+                renouvelles pas ta licence, <strong>toutes ces réponses seront effacées</strong>.
+              </p>
+            </div>
+            <Button
+              size="lg"
+              variant="destructive"
+              className="h-14 w-full text-base"
+              onClick={confirmNoWithReset}
+            >
+              Confirmer — je ne renouvelle pas
+            </Button>
+            <button
+              type="button"
+              onClick={() => setChoice(null)}
+              className="w-full text-sm text-muted-foreground underline underline-offset-4"
+            >
+              ← Annuler
+            </button>
+          </motion.div>
+        )}
+
+        {/* Incertain */}
         {choice === 'unsure' && (
           <motion.div key="unsure-form" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div className="rounded-xl border border-secondary/50 bg-secondary/20 p-4">
@@ -129,6 +173,7 @@ export function LicenseStep() {
           </motion.div>
         )}
 
+        {/* Formulaire "Non" */}
         {choice === 'no' && (
           <motion.div key="no-form" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div className="space-y-2">
@@ -146,6 +191,7 @@ export function LicenseStep() {
             <button type="button" onClick={() => setChoice(null)} className="w-full text-sm text-muted-foreground underline underline-offset-4">← Revenir</button>
           </motion.div>
         )}
+
       </AnimatePresence>
     </div>
   )
