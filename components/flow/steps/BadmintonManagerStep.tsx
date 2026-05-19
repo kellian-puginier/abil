@@ -8,7 +8,6 @@ import { useQuestionnaireStore } from '@/stores/questionnaire'
 import { getNextStep } from '@/lib/flow-config'
 import { createClient } from '@/lib/supabase/client'
 import { buildUpsertPayload } from '@/lib/flow-save'
-import { getBmAllowedTeams, getPlayerLevel } from '@/lib/eligibility'
 import {
   validateRoster, validateLineup, getAvailablePlayersForTeam,
   getAssignedPlayerIds, countAppearances,
@@ -83,23 +82,14 @@ export function BadmintonManagerStep() {
     })
   }, [])
 
-  const playerLevel    = store.player ? getPlayerLevel(store.player) : 'departemental'
-  const allowedByLevel = new Set(getBmAllowedTeams(playerLevel))
-
   const preferredCodes = store.preferredTeams.includes('any')
     ? allTeams.map((t) => t.code)
     : store.preferredTeams
 
-  // Équipes que le joueur veut faire + accessibles selon son niveau
-  const myTeams = allTeams.filter(
-    (t) => preferredCodes.includes(t.code) && allowedByLevel.has(t.code as TeamCode)
-  )
-  // Autres équipes accessibles selon son niveau mais non cochées à l'écran 9
-  const otherTeams = allTeams.filter(
-    (t) => !preferredCodes.includes(t.code) && allowedByLevel.has(t.code as TeamCode)
-  )
-  // Union pour les vérifications (ex: équipes déjà faites)
-  const eligibleTeams = [...myTeams, ...otherTeams]
+  // Équipes que le joueur a sélectionnées à l'étape "équipes souhaitées" (mises en avant)
+  const myTeams = allTeams.filter((t) => preferredCodes.includes(t.code))
+  // Toutes les autres équipes du club (libres d'accès pour BM)
+  const otherTeams = allTeams.filter((t) => !preferredCodes.includes(t.code))
 
   const alreadyAssigned  = getAssignedPlayerIds(assignments)
   const availablePlayers = getAvailablePlayersForTeam(allPlayers, alreadyAssigned, (currentTeam ?? 'D6') as TeamCode)
@@ -245,35 +235,29 @@ export function BadmintonManagerStep() {
         {subStep === 'team-pick' && (
           <SubStepWrap key="team-pick">
             <p className="font-semibold">Pour quelle équipe veux-tu proposer une compo ?</p>
-            <p className="text-xs text-muted-foreground">
-              Niveau : <strong>{playerLevel === 'regional_plus' ? 'Régional+' : 'Départemental'}</strong>
-            </p>
 
-            {myTeams.length === 0 && otherTeams.length === 0 && (
-              <p className="text-sm text-muted-foreground rounded-xl border bg-muted/50 p-4">
-                Aucune équipe accessible selon ton niveau.
-              </p>
-            )}
-
-            {/* Mes équipes (préférences écran 9) */}
+            {/* Mes équipes préférées (mises en avant) */}
             {myTeams.length > 0 && (
               <div className="space-y-2">
-                {myTeams.map((t) => <TeamButton key={t.code} team={t} done={!!assignments[t.code]} onPick={pickTeam} />)}
+                <p className="text-xs font-semibold text-primary uppercase tracking-wide">
+                  ⭐ Tes équipes souhaitées
+                </p>
+                {myTeams.map((t) => <TeamButton key={t.code} team={t} done={!!assignments[t.code]} onPick={pickTeam} highlighted />)}
               </div>
             )}
 
-            {/* Autres équipes du club accessibles selon le niveau */}
+            {/* Toutes les autres équipes du club */}
             {otherTeams.length > 0 && (
               <div className="space-y-2">
-                <div className="rounded-xl bg-secondary/30 border border-secondary/50 px-3 py-2">
-                  <p className="text-xs font-semibold text-secondary-foreground">
-                    Tu peux aussi proposer des compos pour d'autres équipes du club 👇
+                <div className="rounded-xl bg-muted/50 border border-border px-3 py-2">
+                  <p className="text-xs font-semibold text-foreground">
+                    Toutes les équipes du club 👇
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Ce n'est pas obligatoire, mais c'est utile pour le staff !
+                    Tu peux proposer des compos pour n'importe quelle équipe !
                   </p>
                 </div>
-                {otherTeams.map((t) => <TeamButton key={t.code} team={t} done={!!assignments[t.code]} onPick={pickTeam} secondary />)}
+                {otherTeams.map((t) => <TeamButton key={t.code} team={t} done={!!assignments[t.code]} onPick={pickTeam} />)}
               </div>
             )}
 
@@ -389,7 +373,7 @@ export function BadmintonManagerStep() {
             ))}
 
             <div className="space-y-3 pt-2">
-              {[...myTeams, ...otherTeams].filter((t) => !assignments[t.code]).length > 0 && (
+              {allTeams.filter((t) => !assignments[t.code]).length > 0 && (
                 <Button variant="outline" size="lg" className="w-full"
                   onClick={() => setSubStep('team-pick')}>
                   + Proposer une autre équipe
@@ -409,28 +393,30 @@ export function BadmintonManagerStep() {
 
 // ── Composants internes ────────────────────────────────────────────────────
 
-function TeamButton({ team, done, onPick, secondary }: {
+function TeamButton({ team, done, onPick, highlighted }: {
   team: Team
   done: boolean
   onPick: (code: string) => void
-  secondary?: boolean
+  highlighted?: boolean
 }) {
   return (
     <button
       type="button"
       onClick={() => onPick(team.code)}
       className={cn(
-        'flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors',
+        'flex w-full items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors',
         done
           ? 'border-primary/40 bg-primary/5'
-          : secondary
-          ? 'border-border/60 bg-muted/30 hover:border-primary/40'
-          : 'border-border bg-card hover:border-primary/40'
+          : highlighted
+          ? 'border-primary/30 bg-primary/5 hover:border-primary/60'
+          : 'border-border bg-card hover:border-primary/30'
       )}
     >
       <span className={cn(
         'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold',
-        done ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
+        done        ? 'bg-primary text-white' :
+        highlighted ? 'bg-primary/20 text-primary' :
+                      'bg-muted text-muted-foreground'
       )}>
         {team.code}
       </span>
@@ -442,10 +428,7 @@ function TeamButton({ team, done, onPick, secondary }: {
           ).join(' / ')}
         </p>
       </div>
-      {done
-        ? <span className="text-xs font-semibold text-primary">✓ Compo faite</span>
-        : secondary && <span className="text-xs text-muted-foreground">Optionnel</span>
-      }
+      {done && <span className="text-xs font-semibold text-primary">✓ Compo faite</span>}
     </button>
   )
 }
