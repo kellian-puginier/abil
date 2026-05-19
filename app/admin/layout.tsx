@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -24,7 +25,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <header className="border-b bg-background px-4 py-3">
           <div className="mx-auto flex max-w-6xl items-center justify-between">
             <div className="flex items-center gap-6">
-              <span className="text-sm font-bold text-primary">🏸 Admin ABIL</span>
+              <Image
+                src="/logo-abil-noir.png"
+                alt="ABIL"
+                width={72}
+                height={72}
+                className="h-9 w-auto"
+              />
               <nav className="hidden gap-4 md:flex">
                 {navLinks.map((l) => (
                   <Link

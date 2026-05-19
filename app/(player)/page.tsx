@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -97,14 +98,21 @@ export default function AccueilPage() {
             Dis-nous tes projections pour la saison — 3 minutes chrono.
           </motion.p>
 
-          {/* Navette déco */}
+          {/* Logo ABIL */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.7, rotate: -20 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="mt-6 flex h-20 w-20 items-center justify-center rounded-full bg-white/15 text-5xl shadow-xl ring-4 ring-white/20"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-6"
           >
-            🏸
+            <Image
+              src="/logo-abil-blanc.png"
+              alt="ABIL — Bad In Lez"
+              width={160}
+              height={160}
+              className="mx-auto drop-shadow-xl"
+              priority
+            />
           </motion.div>
         </div>
       </div>

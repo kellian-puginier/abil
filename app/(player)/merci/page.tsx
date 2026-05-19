@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import confetti from 'canvas-confetti'
 import { useQuestionnaireStore } from '@/stores/questionnaire'
 import { Button } from '@/components/ui/button'
@@ -31,8 +32,14 @@ export default function MerciPage() {
           transition={{ duration: 0.5, type: 'spring', stiffness: 200 }}
           className="space-y-6"
         >
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary shadow-xl shadow-primary/30 text-5xl">
-            🏸
+          <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-primary shadow-xl shadow-primary/30 p-3">
+            <Image
+              src="/logo-abil-blanc.png"
+              alt="ABIL"
+              width={90}
+              height={90}
+              className="drop-shadow"
+            />
           </div>
 
           <div className="space-y-2">
