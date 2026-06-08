@@ -16,6 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin/ic-dates', label: 'Dates IC' },
     { href: '/admin/ic-events', label: 'Événements' },
     { href: '/admin/responses', label: 'Réponses' },
+    { href: '/admin/consultation-n2', label: 'Consultation N2' },
     { href: '/admin/bm-stats', label: 'BM Stats' },
   ]
 

@@ -110,3 +110,29 @@ export type Response = {
 export type PlayerWithStats = Player & {
   stats: PlayerStats | null
 }
+
+// ── Consultation N2 2026-2027 (branche indépendante) ────────────────────────
+export type ConsultationTeam      = 'n2' | 'n3'
+export type ConsultationDirection = 'n2' | 'neutre' | 'n3'
+
+export type ConsultationN2Response = {
+  id: string
+  created_at: string
+
+  is_anonymous: boolean
+  respondent_name: string | null
+  team: ConsultationTeam
+
+  feeling_text: string | null
+
+  preferred_direction: ConsultationDirection | null
+  direction_reason_text: string | null
+
+  priorities: string[] | null
+  priorities_other_text: string | null
+  rebuild_involvement_text: string | null
+  recruitment_opinion_text: string | null
+
+  other_arguments_text: string | null
+  availability_ambition_text: string | null
+}
