@@ -45,9 +45,17 @@ export function AccueilStep() {
           La saison vient de se terminer et ouvre une question importante pour
           le club : quel avenir pour notre équipe première ? Le club a obtenu
           un repêchage qui lui permet de choisir entre rester en Nationale 2
-          ou redescendre en Nationale 3. Dans les deux cas, l'équipe va se
-          renouveler la saison prochaine — plusieurs joueuses cadres ne seront
-          pas disponibles.
+          ou redescendre en Nationale 3.
+        </p>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          Ce choix se pose dans un contexte particulier : plusieurs joueuses
+          qui portaient l'équipe cette saison ne seront pas là la saison
+          prochaine, pour des raisons qui leur sont propres. Concrètement,
+          cela veut dire que des joueuses de nos équipes inférieures vont être
+          amenées à monter pour composer ce groupe. La question ne porte donc
+          pas sur l'équipe telle qu'elle a existé cette année, mais sur le
+          projet à construire avec ce nouveau collectif — et c'est précisément
+          pour ça que ton regard compte.
         </p>
         <p className="text-muted-foreground text-sm leading-relaxed">
           C'est un vrai choix d'avenir, et il n'est pas encore arrêté : ton avis

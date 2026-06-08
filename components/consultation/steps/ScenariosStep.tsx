@@ -52,7 +52,14 @@ export function ScenariosStep() {
           Voici les deux options sur la table, présentées à parts égales —
           chacune a ses forces et ses exigences. Aucune n'est "la bonne
           réponse" : c'est justement pour ça qu'on a besoin de ton éclairage.
-          Prends le temps de les lire avant de donner ton avis.
+        </p>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          Garde en tête le contexte évoqué juste avant : dans les deux cas,
+          l'équipe sera en grande partie renouvelée, avec notamment des
+          joueuses de nos équipes inférieures appelées à monter pour la
+          composer. C'est pour ce nouveau collectif, pas pour l'équipe
+          actuelle, que la question se pose. Prends le temps de lire les deux
+          options avant de donner ton avis.
         </p>
       </div>
 
