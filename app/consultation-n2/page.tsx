@@ -102,6 +102,7 @@ export default function ConsultationGatePage() {
           </div>
 
           <Button
+            type="submit"
             size="lg"
             className="h-14 w-full text-base font-semibold shadow-md"
             disabled={loading || !code.trim()}
