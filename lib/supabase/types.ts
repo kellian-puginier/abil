@@ -112,7 +112,7 @@ export type PlayerWithStats = Player & {
 }
 
 // ── Consultation N2 2026-2027 (branche indépendante) ────────────────────────
-export type ConsultationTeam      = 'n2' | 'n3'
+export type ConsultationTeam      = 'n2' | 'n3' | 'bureau' | 'autre'
 export type ConsultationDirection = 'n2' | 'neutre' | 'n3'
 
 export type ConsultationN2Response = {

@@ -30,7 +30,7 @@ export function ArgumentsStep() {
     const { error: err } = await supabase.from('consultation_n2_responses').insert({
       is_anonymous: s.isAnonymous,
       respondent_name: s.isAnonymous ? null : (s.respondentName || null),
-      team: (s.team || 'n2') as 'n2' | 'n3',
+      team: (s.team || 'n2') as 'n2' | 'n3' | 'bureau' | 'autre',
       feeling_text: s.feelingText || null,
       preferred_direction: s.preferredDirection,
       direction_reason_text: s.directionReasonText || null,

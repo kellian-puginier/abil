@@ -11,8 +11,10 @@ import { getNextConsultationStep } from '@/lib/consultation-config'
 import { cn } from '@/lib/utils'
 
 const TEAM_OPTIONS = [
-  { value: 'n2', label: 'Équipe N2', desc: 'Tu évolues actuellement en Nationale 2' },
-  { value: 'n3', label: 'Équipe N3', desc: 'Tu évolues actuellement en Nationale 3' },
+  { value: 'n2',     label: 'Équipe N2',     desc: 'Tu évolues actuellement en Nationale 2' },
+  { value: 'n3',     label: 'Équipe N3',     desc: 'Tu évolues actuellement en Nationale 3' },
+  { value: 'bureau', label: 'Bureau / commission IC', desc: "Tu es membre du bureau ou de la commission interclubs" },
+  { value: 'autre',  label: 'Autre',         desc: "Tu évolues dans une autre équipe du club" },
 ] as const
 
 export function AccueilStep() {

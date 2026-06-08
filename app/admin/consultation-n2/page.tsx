@@ -13,7 +13,9 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import type { ConsultationN2Response } from '@/lib/supabase/types'
 
-const TEAM_LABELS: Record<string, string> = { n2: 'Équipe N2', n3: 'Équipe N3' }
+const TEAM_LABELS: Record<string, string> = {
+  n2: 'Équipe N2', n3: 'Équipe N3', bureau: 'Bureau / commission IC', autre: 'Autre',
+}
 const DIRECTION_LABELS: Record<string, string> = {
   n2: 'Plutôt rester en N2', neutre: 'Sans avis tranché', n3: 'Plutôt descendre en N3',
 }
@@ -25,7 +27,7 @@ const PRIORITY_LABELS: Record<string, string> = {
 export default function AdminConsultationN2Page() {
   const [responses, setResponses] = useState<ConsultationN2Response[]>([])
   const [search, setSearch]       = useState('')
-  const [filterTeam, setFilterTeam]           = useState<'all' | 'n2' | 'n3'>('all')
+  const [filterTeam, setFilterTeam]           = useState<'all' | 'n2' | 'n3' | 'bureau' | 'autre'>('all')
   const [filterDirection, setFilterDirection] = useState<'all' | 'n2' | 'neutre' | 'n3' | 'none'>('all')
   const [detail, setDetail]       = useState<ConsultationN2Response | null>(null)
 
@@ -55,8 +57,10 @@ export default function AdminConsultationN2Page() {
   // ── Statistiques simples ─────────────────────────────────────────────────
   const total  = responses.length
   const byTeam = {
-    n2: responses.filter((r) => r.team === 'n2').length,
-    n3: responses.filter((r) => r.team === 'n3').length,
+    n2:     responses.filter((r) => r.team === 'n2').length,
+    n3:     responses.filter((r) => r.team === 'n3').length,
+    bureau: responses.filter((r) => r.team === 'bureau').length,
+    autre:  responses.filter((r) => r.team === 'autre').length,
   }
   const byDirection = {
     n2:     responses.filter((r) => r.preferred_direction === 'n2').length,
@@ -106,7 +110,7 @@ export default function AdminConsultationN2Page() {
       {/* Statistiques */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Réponses reçues" value={total} />
-        <StatCard label="Équipe N2 / N3" value={`${byTeam.n2} / ${byTeam.n3}`} />
+        <StatCard label="N2 / N3 / Bureau / Autre" value={`${byTeam.n2} / ${byTeam.n3} / ${byTeam.bureau} / ${byTeam.autre}`} />
         <StatCard label="Plutôt N2 / Neutre / N3" value={`${byDirection.n2} / ${byDirection.neutre} / ${byDirection.n3}`} />
         <StatCard label="Sans avis exprimé" value={byDirection.none} />
       </div>
@@ -137,6 +141,8 @@ export default function AdminConsultationN2Page() {
           <option value="all">Équipe : toutes</option>
           <option value="n2">Équipe N2</option>
           <option value="n3">Équipe N3</option>
+          <option value="bureau">Bureau / commission IC</option>
+          <option value="autre">Autre</option>
         </select>
         <select value={filterDirection} onChange={(e) => setFilterDirection(e.target.value as any)}
           className="h-10 rounded-lg border bg-background px-3 text-sm">
