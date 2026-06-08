@@ -17,7 +17,7 @@ const SCENARIOS = [
       },
       {
         label: 'Ce que ça demande',
-        text: "Une saison sportivement exigeante : déplacements plus lourds, frais plus élevés, adversaires relevés. Une piste serait de renforcer l'effectif par du recrutement extérieur — ce qui suppose un budget conséquent.",
+        text: "Une saison sportivement exigeante : déplacements plus lourds, adversaires relevés. Une piste serait de renforcer l'effectif par du recrutement extérieur — ce qui suppose un budget conséquent.",
       },
     ],
   },
